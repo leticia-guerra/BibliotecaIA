@@ -1,0 +1,50 @@
+.cardCatalogo {
+  background-color: #ffffff;
+  border: 1px solid #e0dcd7;
+  border-radius: 14px;
+  padding: 24px;
+  height: 100%;
+  border-left: 6px solid #8B5E3C;
+}
+
+.titulo {
+  font-size: 20px;
+  font-weight: bold;
+  color: #2f241f;
+}
+
+.autor {
+  color: #666;
+  margin-bottom: 12px;
+}
+
+.info {
+  color: #6b5b50;
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.genero {
+  display: inline-block;
+  margin: 8px 0 12px;
+  color: #8B5E3C;
+  font-weight: 600;
+}
+
+.resumo {
+  color: #4a403a;
+  line-height: 1.6;
+}
+
+.botaoVoltar {
+  background-color: #f3e7dc !important;
+  color: #8B5E3C !important;
+  border: none !important;
+  border-radius: 10px;
+  padding: 8px 16px;
+}
+
+.botaoVoltar:hover {
+  background-color: #e8d8c7 !important;
+}

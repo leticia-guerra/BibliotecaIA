@@ -1,0 +1,14 @@
+.container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.form {
+  width: 350px;
+  padding: 30px;
+  border-radius: 10px;
+  background-color: #f8f5f2;
+  border: 1px solid #ddd;
+}
