@@ -1,0 +1,42 @@
+.header {
+  background-color: #f8f5f2;
+  border-bottom: 1px solid #e0dcd7;
+  padding: 15px 0;
+}
+
+.logo {
+  width: 50px;
+  height: 50px;
+  background-color: #8B5E3C;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  margin-right: 15px;
+}
+
+.titulo {
+  margin: 0;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.subtitulo {
+  color: #777;
+  font-size: 14px;
+}
+
+.logoutButton {
+  background-color: #f3e7dc !important;
+  color: #8B5E3C !important;
+  border: none !important;
+  padding: 8px;
+  border-radius: 8px;
+  text-decoration: none !important;
+}
+
+.logoutButton:hover {
+  background-color: #e8d8c7 !important;
+  color: #5a3b25 !important;
+}

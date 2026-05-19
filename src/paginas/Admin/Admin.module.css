@@ -1,0 +1,31 @@
+.cardAdmin {
+  padding: 24px;
+  border-radius: 14px;
+  border: 1px solid #e0dcd7;
+  background-color: #ffffff;
+  height: 100%;
+}
+
+.icone {
+  width: 48px;
+  height: 48px;
+  background-color: #f3e7dc;
+  color: #8B5E3C;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  margin-bottom: 16px;
+}
+
+.botao {
+  background-color: #8B5E3C !important;
+  border: none !important;
+  border-radius: 10px;
+  padding: 10px 18px;
+}
+
+.botao:hover {
+  background-color: #6f4a2f !important;
+}

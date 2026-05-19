@@ -1,0 +1,80 @@
+.botaoPrincipal {
+  background-color: #8B5E3C !important;
+  border: none !important;
+  padding: 10px 18px;
+  border-radius: 10px;
+}
+
+.botaoPrincipal:hover {
+  background-color: #6f4a2f !important;
+}
+
+.cardLivro {
+  background-color: #ffffff;
+  border: 1px solid #e0dcd7;
+  border-radius: 14px;
+  padding: 24px;
+  border-left: 6px solid #8B5E3C;
+}
+
+.tituloLivro {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.autorLivro {
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.generoLivro {
+  color: #8B5E3C;
+  font-weight: 500;
+}
+
+.comentarioLivro {
+  font-style: italic;
+  margin-top: 10px;
+}
+
+.infoLivro {
+  display: flex;
+  align-items: center;
+  color: #5c5148;
+  margin-bottom: 8px;
+}
+
+.cardRecomendacaoIA {
+  background-color: #f8f5f2;
+  border: 1px solid #e0dcd7;
+  border-radius: 16px;
+  padding: 24px;
+  line-height: 1.7;
+  font-family: 'Segoe UI', sans-serif;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.tituloIA {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.autorIA {
+  color: #7a6b61;
+  margin-bottom: 10px;
+}
+
+.justificativaIA {
+  color: #4a403a;
+}
+
+.rodapeHome {
+  margin-top: 60px;
+  padding: 32px 20px;
+  text-align: center;
+  color: #7a6b61;
+  border-top: 1px solid #e0dcd7;
+  font-size: 14px;
+  margin-bottom: 40px;
+}
