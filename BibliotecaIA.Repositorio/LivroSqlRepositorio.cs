@@ -22,10 +22,11 @@ namespace BibliotecaIA.Repositorio
         {
             return new SqlConnection(_connectionString);
         }
+        // Implementação dos métodos para manipulação de livros no banco de dados
         public async Task<IEnumerable<Livro>> ListarLivrosPorUsuarioAsync(int usuarioId)
         {
             using var conexao = CriarConexao();
-
+            // Chamando a stored procedure para listar os livros do usuário
             return await conexao.QueryAsync<Livro>(
                 "sp_ListarLivrosPorUsuario",
                 new { usuarioId },
@@ -35,7 +36,7 @@ namespace BibliotecaIA.Repositorio
         public async Task InserirLivroPorUsuarioAsync(Livro livro)
         {
             using var conexao = CriarConexao();
-
+            // Chamando a stored procedure para inserir um livro para o usuário
             var parametros = new
             {
                 titulo = livro.Titulo,
@@ -52,7 +53,7 @@ namespace BibliotecaIA.Repositorio
         }
 
         public async Task<Livro> BuscarLivroPorIdEUsuarioAsync(int livroId, int usuarioId)
-        {
+        { // Chamando a stored procedure para buscar o livro do usuário por ID
             using var conexao = CriarConexao();
 
             return await conexao.QueryFirstOrDefaultAsync<Livro>(
@@ -62,7 +63,7 @@ namespace BibliotecaIA.Repositorio
         }
 
         public async Task AtualizarLivroUsuarioAsync(Livro livro)
-        {
+        { // Chamando a stored procedure para atualizar o livro do usuário
             using var conexao = CriarConexao();
 
             var parametros = new
@@ -84,7 +85,7 @@ namespace BibliotecaIA.Repositorio
         public async Task ExcluirLivroUsuarioAsync(int livroId, int usuarioId)
         {
             using var conexao = CriarConexao();
-
+            // Chamando a stored procedure para excluir o livro do usuário
             await conexao.ExecuteAsync(
                 "sp_ExcluirLivroUsuario",
                 new { livroId, usuarioId },
@@ -92,7 +93,7 @@ namespace BibliotecaIA.Repositorio
         }
 
         public async Task<int> ObterQuantidadeLivrosPorUsuarioAsync(int usuarioId)
-        {
+        { // Chamando a função para obter a quantidade de livros do usuário
             using var conexao = CriarConexao();
 
             return await conexao.ExecuteScalarAsync<int>(
@@ -103,10 +104,17 @@ namespace BibliotecaIA.Repositorio
         public async Task<int> ObterTotalPaginasPorUsuarioAsync(int usuarioId)
         {
             using var conexao = CriarConexao();
-
+            // Chamando a função para obter o total de páginas dos livros do usuário
             return await conexao.ExecuteScalarAsync<int>(
                 "SELECT dbo.fn_TotalPaginasPorUsuario(@usuarioId)",
                 new { usuarioId });
+        }
+        public async Task<IEnumerable<Livro>> ListarLivrosViewAsync()
+        {// Chamando a view para listar os livros do usuário
+            using var conexao = CriarConexao();
+
+            return await conexao.QueryAsync<Livro>(
+                "SELECT * FROM vw_Livros");
         }
     }
 }

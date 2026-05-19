@@ -68,5 +68,11 @@ namespace BibliotecaIA.Api.Controllers
             var totalPaginas = await _livroSqlAplicacao.ObterTotalPaginasPorUsuarioAsync(usuarioId);
             return Ok(totalPaginas);
         }
+        [HttpGet("listar-view")]
+        public async Task<IActionResult> ListarView()
+        {
+            var livros = await _livroSqlAplicacao.ListarLivrosViewAsync();
+            return Ok(livros);
+        }
     }
 }

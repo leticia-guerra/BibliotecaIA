@@ -50,5 +50,9 @@ namespace BibliotecaIA.Aplicacao
         {
             return await _livroSqlRepositorio.ObterTotalPaginasPorUsuarioAsync(usuarioId);
         }
+        public async Task<IEnumerable<Livro>> ListarLivrosViewAsync()
+        {
+            return await _livroSqlRepositorio.ListarLivrosViewAsync();
+        }
     }
 }
