@@ -34,7 +34,7 @@ namespace BibliotecaIA.Api.Controllers
                 return BadRequest("Gênero é obrigatório.");
             }
 
-            var livros = await _livroSqlAplicacao.ListarLivrosPorUsuarioAsync(usuarioId);
+            var livros = await _livroSqlAplicacao.ListarLivrosPorUsuarioAsync(usuarioId);// Procedure
 
             var promptBuilder = new StringBuilder();
 

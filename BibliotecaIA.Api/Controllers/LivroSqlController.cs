@@ -15,7 +15,7 @@ namespace BibliotecaIA.Api.Controllers
         {
             _livroSqlAplicacao = livroSqlAplicacao;
         }
-
+//Procedures
         [HttpGet("listar-por-usuario/{usuarioId}")]
         public async Task<IActionResult> ListarPorUsuario(int usuarioId)
         {
@@ -54,7 +54,7 @@ namespace BibliotecaIA.Api.Controllers
             await _livroSqlAplicacao.ExcluirLivroUsuarioAsync(livroId, usuarioId);
             return Ok("Livro excluído com sucesso.");
         }
-
+//Functions
         [HttpGet("quantidade-por-usuario/{usuarioId}")]
         public async Task<IActionResult> QuantidadeLivrosPorUsuario(int usuarioId)
         {
@@ -68,6 +68,7 @@ namespace BibliotecaIA.Api.Controllers
             var totalPaginas = await _livroSqlAplicacao.ObterTotalPaginasPorUsuarioAsync(usuarioId);
             return Ok(totalPaginas);
         }
+//View         
         [HttpGet("listar-view")]
         public async Task<IActionResult> ListarView()
         {
