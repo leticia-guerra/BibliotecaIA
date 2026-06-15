@@ -1,14 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Row, Col, Button, Form, Card } from 'react-bootstrap';
+import { Container, Row, Col, Button, Form, Card, Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import {
-  FaBookOpen,
-  FaFileAlt,
-  FaStar,
-  FaTags,
-  FaCalendarAlt
-} from 'react-icons/fa';
-
+import {FaBookOpen,FaFileAlt,FaStar,FaTags,FaCalendarAlt,FaTrash,FaEdit} from 'react-icons/fa';
 import styles from './Home.module.css';
 import Header from '../../componentes/Header/Header';
 import CardResumo from '../../componentes/CardResumo/CardResumo';
@@ -26,26 +19,48 @@ function Home() {
   const [textoBusca, setTextoBusca] = useState('');
   const [generoFiltro, setGeneroFiltro] = useState('');
 
+  const [livroEditando, setLivroEditando] = useState(null);
+  const [modalAberto, setModalAberto] = useState(false);
+
   const [generoSelecionado, setGeneroSelecionado] = useState('');
   const [respostaIA, setRespostaIA] = useState('');
   const [carregandoIA, setCarregandoIA] = useState(false);
   const [erroIA, setErroIA] = useState('');
 
-  useEffect(() => {
-    const buscarLivros = async () => {
-      try {
-        const response = await fetch(
-          `http://localhost:5211/api/Livro/ListarPorUsuario/${usuarioLogado.id}`
-        );
+  // Functions e Stored Procedures para dados do usuário
+  const [quantidadeLivros, setQuantidadeLivros] = useState(0);
+  const [totalPaginas, setTotalPaginas] = useState(0);
 
-        const data = await response.json();
-        setLivros(data);
+  useEffect(() => {
+    const buscarDados = async () => {
+      try {
+        // Stored Procedure: busca os livros do usuário
+        const responseLivros = await fetch(
+          `http://localhost:5211/api/LivroSql/listar-por-usuario/${usuarioLogado.id}`
+        );
+        const dataLivros = await responseLivros.json();
+        setLivros(dataLivros);
+
+        // Function: busca a quantidade de livros do usuário
+        const responseQuantidade = await fetch(
+          `http://localhost:5211/api/LivroSql/quantidade-por-usuario/${usuarioLogado.id}`
+        );
+        const dataQuantidade = await responseQuantidade.json();
+        setQuantidadeLivros(dataQuantidade);
+
+        // Function: busca o total de páginas lidas pelo usuário
+        const responsePaginas = await fetch(
+          `http://localhost:5211/api/LivroSql/total-paginas-por-usuario/${usuarioLogado.id}`
+        );
+        const dataPaginas = await responsePaginas.json();
+        setTotalPaginas(dataPaginas);
+
       } catch (error) {
         console.error(error);
       }
     };
 
-    buscarLivros();
+    buscarDados();
   }, [usuarioLogado.id]);
 
   const gerarRecomendacoes = async () => {
@@ -59,7 +74,7 @@ function Home() {
 
     try {
       setCarregandoIA(true);
-
+      // Chamada à API para obter recomendações IA
       const response = await fetch(
         `http://localhost:5211/api/AI/recomendar-por-usuario/${usuarioLogado.id}?genero=${encodeURIComponent(generoSelecionado)}`
       );
@@ -70,6 +85,55 @@ function Home() {
       setErroIA(error.message);
     } finally {
       setCarregandoIA(false);
+    }
+  };
+
+  const excluirLivro = async (livroId) => {
+    const confirmar = window.confirm('Deseja realmente excluir este livro?');
+    if (!confirmar) return;
+
+    try {
+      const response = await fetch(
+        `http://localhost:5211/api/LivroSql/excluir-usuario/${livroId}/${usuarioLogado.id}`,
+        { method: 'DELETE' }
+      );
+
+      if (response.ok) {
+        setLivros(livros.filter((l) => l.id !== livroId));
+        setQuantidadeLivros((q) => q - 1);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const abrirEdicao = (livro) => {
+    setLivroEditando({ ...livro });
+    setModalAberto(true);
+  };
+
+  const salvarEdicao = async () => {
+    try {
+      await fetch('http://localhost:5211/api/LivroSql/atualizar-usuario', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: livroEditando.id,
+          titulo: livroEditando.titulo,
+          autor: livroEditando.autor,
+          genero: livroEditando.genero,
+          quantPaginas: Number(livroEditando.quantPaginas),
+          dataLeitura: livroEditando.dataLeitura,
+          avaliacao: Number(livroEditando.avaliacao),
+          comentario: livroEditando.comentario,
+          usuarioID: usuarioLogado.id
+        })
+      });
+
+      setLivros(livros.map((l) => (l.id === livroEditando.id ? livroEditando : l)));
+      setModalAberto(false);
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -97,11 +161,6 @@ function Home() {
 
     return correspondeTexto && correspondeGenero;
   });
-
-  const totalPaginas = livros.reduce(
-    (total, livro) => total + livro.quantPaginas,
-    0
-  );
 
   const mediaAvaliacao =
     livros.length > 0
@@ -148,14 +207,16 @@ function Home() {
       <Container className="mt-4">
         <Row className="g-3">
           <Col md={3}>
+            {/* Quantidade de livros vinda da Function do banco */}
             <CardResumo
               titulo="Livros lidos"
-              valor={livros.length}
+              valor={quantidadeLivros}
               icone={<FaBookOpen />}
             />
           </Col>
 
           <Col md={3}>
+            {/* Total de páginas vindo da Function do banco */}
             <CardResumo
               titulo="Páginas lidas"
               valor={totalPaginas}
@@ -239,7 +300,7 @@ function Home() {
                   .trim();
 
                 return (
-                  <Col md={4} key={index}>
+                  <Col md={4} key={`rec-${index}`}>
                     <div className={styles.cardRecomendacaoIA}>
                       <h5 className={styles.tituloIA}>{titulo}</h5>
 
@@ -278,7 +339,7 @@ function Home() {
         </Card>
 
         <div className="d-flex justify-content-between align-items-center mt-5 mb-3">
-          <h4>Meus Livros ({livros.length})</h4>
+          <h4>Meus Livros ({quantidadeLivros})</h4>
 
           <Button
             onClick={() => navigate('/livros/cadastrar')}
@@ -349,6 +410,15 @@ function Home() {
                 <p className={styles.comentarioLivro}>
                   "{livro.comentario}"
                 </p>
+
+                <div className="d-flex gap-2 mt-3">
+                  <Button size="sm" className={styles.botaoPrincipal} onClick={() => abrirEdicao(livro)}>
+                    <FaEdit className="me-1" /> Editar
+                  </Button>
+                  <Button size="sm" variant="danger" onClick={() => excluirLivro(livro.id)}>
+                    <FaTrash className="me-1" /> Excluir
+                  </Button>
+                </div>
               </div>
             </Col>
           ))}
@@ -364,9 +434,59 @@ function Home() {
             </Button>
           </div>
         )}
+
         <div className={styles.rodapeHome}>
           BibliotecaIA — Organize suas leituras e descubra novas recomendações com inteligência artificial.
         </div>
+
+        <Modal show={modalAberto} onHide={() => setModalAberto(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>Editar Livro</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {livroEditando && (
+              <>
+                <Form.Group className="mb-3">
+                  <Form.Label>Título</Form.Label>
+                  <Form.Control value={livroEditando.titulo}
+                    onChange={(e) => setLivroEditando({ ...livroEditando, titulo: e.target.value })} />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Autor</Form.Label>
+                  <Form.Control value={livroEditando.autor}
+                    onChange={(e) => setLivroEditando({ ...livroEditando, autor: e.target.value })} />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Gênero</Form.Label>
+                  <Form.Select value={livroEditando.genero}
+                    onChange={(e) => setLivroEditando({ ...livroEditando, genero: e.target.value })}>
+                    {generos.map((g) => <option key={g} value={g}>{g}</option>)}
+                  </Form.Select>
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Páginas</Form.Label>
+                  <Form.Control type="number" value={livroEditando.quantPaginas}
+                    onChange={(e) => setLivroEditando({ ...livroEditando, quantPaginas: e.target.value })} />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Avaliação (1-5)</Form.Label>
+                  <Form.Control type="number" min="1" max="5" value={livroEditando.avaliacao}
+                    onChange={(e) => setLivroEditando({ ...livroEditando, avaliacao: e.target.value })} />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Comentário</Form.Label>
+                  <Form.Control as="textarea" rows={3} value={livroEditando.comentario}
+                    onChange={(e) => setLivroEditando({ ...livroEditando, comentario: e.target.value })} />
+                </Form.Group>
+              </>
+            )}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setModalAberto(false)}>Cancelar</Button>
+            <Button className={styles.botaoPrincipal} onClick={salvarEdicao}>Salvar</Button>
+          </Modal.Footer>
+        </Modal>
+
       </Container>
     </>
   );

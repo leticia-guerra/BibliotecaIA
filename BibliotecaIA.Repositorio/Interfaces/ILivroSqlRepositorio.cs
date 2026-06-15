@@ -1,7 +1,7 @@
 using BibliotecaIA.Dominio.Entidades;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
+// Interface para o repositório de livros utilizando Dapper para acesso direto ao banco de dados
 namespace BibliotecaIA.Repositorio.Interfaces
 {
     public interface ILivroSqlRepositorio

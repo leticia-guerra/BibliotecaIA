@@ -36,7 +36,7 @@ namespace BibliotecaIA.Aplicacao.Services
                 model = model,
                 messages = new[]
                 {
-                    new { role = "user", content = prompt }
+                    new { role = "user", content = prompt } //prompt vem do AIController, que é o texto de entrada para a IA gerar a resposta
                 },
                 max_tokens = 2000
             };

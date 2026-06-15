@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using BibliotecaIA.Dominio.Entidades;
 
 namespace BibliotecaIA.Repositorio.Configuracoes
-{
+{// Configuração da entidade Usuario para o Entity Framework Core
  public class UsuarioConfiguracoes : IEntityTypeConfiguration<Usuario>
     {
         public void Configure(EntityTypeBuilder<Usuario> builder)

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
 
+// Dapper utilizado para chamada direta de Stored Procedures, Functions e Views do banco.
 namespace BibliotecaIA.Repositorio
 {
     public class LivroSqlRepositorio : ILivroSqlRepositorio
@@ -19,7 +20,7 @@ namespace BibliotecaIA.Repositorio
         }
 
         private IDbConnection CriarConexao()
-        {
+        {// Criando uma conexão com o banco de dados utilizando a string de conexão
             return new SqlConnection(_connectionString);
         }
         // Implementação dos métodos para manipulação de livros no banco de dados
@@ -33,7 +34,7 @@ namespace BibliotecaIA.Repositorio
                 commandType: CommandType.StoredProcedure);
         }
 
-        public async Task InserirLivroPorUsuarioAsync(Livro livro)
+       public async Task InserirLivroPorUsuarioAsync(Livro livro)
         {
             using var conexao = CriarConexao();
             // Chamando a stored procedure para inserir um livro para o usuário
@@ -43,7 +44,10 @@ namespace BibliotecaIA.Repositorio
                 autor = livro.Autor,
                 genero = livro.Genero,
                 paginas = livro.QuantPaginas,
-                usuarioId = livro.UsuarioID
+                usuarioId = livro.UsuarioID,
+                dataLeitura = livro.DataLeitura,
+                avaliacao = livro.Avaliacao,
+                comentario = livro.Comentario
             };
 
             await conexao.ExecuteAsync(
@@ -63,9 +67,9 @@ namespace BibliotecaIA.Repositorio
         }
 
         public async Task AtualizarLivroUsuarioAsync(Livro livro)
-        { // Chamando a stored procedure para atualizar o livro do usuário
+        {
             using var conexao = CriarConexao();
-
+            // Chamando a stored procedure para atualizar o livro do usuário
             var parametros = new
             {
                 livroId = livro.ID,
@@ -73,7 +77,10 @@ namespace BibliotecaIA.Repositorio
                 autor = livro.Autor,
                 genero = livro.Genero,
                 paginas = livro.QuantPaginas,
-                usuarioId = livro.UsuarioID
+                usuarioId = livro.UsuarioID,
+                dataLeitura = livro.DataLeitura,
+                avaliacao = livro.Avaliacao,
+                comentario = livro.Comentario
             };
 
             await conexao.ExecuteAsync(

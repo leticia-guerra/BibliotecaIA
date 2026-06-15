@@ -11,7 +11,7 @@ function CadastroLivro() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const livroRecebido = location.state;
+  const livroRecebido = location.state; 
 
   const [tituloBusca, setTituloBusca] = useState('');
   const [resultados, setResultados] = useState([]);
@@ -58,27 +58,63 @@ function CadastroLivro() {
 
   const buscarLivro = async () => {
     setErro('');
+    setResultados([]);
 
     try {
-      const response = await fetch(
+      const responseCatalogo = await fetch(
         `http://localhost:5211/api/CatalogoLivro/BuscarPorTitulo?titulo=${tituloBusca}`
       );
 
-      if (!response.ok) {
-        const mensagem = await response.text();
-        throw new Error(mensagem);
+      if (!responseCatalogo.ok) {
+        throw new Error('Erro ao buscar livros do catálogo');
       }
 
-      const data = await response.json();
+      const dataCatalogo = await responseCatalogo.json();
 
-      const resultadosSemDuplicados = data.filter((livro, index, self) =>
+      let dataLivros = [];
+
+      try {
+        const responseLivros = await fetch(
+          'http://localhost:5211/api/Livro/Listar/true'
+        );
+
+        if (responseLivros.ok) {
+          dataLivros = await responseLivros.json();
+        }
+      } catch (error) {
+        console.error(error);
+      }
+
+      const livrosUsuarios = dataLivros.filter((livro) =>
+        livro.titulo
+          ?.toLowerCase()
+          .includes(tituloBusca.toLowerCase())
+      );
+
+      const todosLivros = [
+        ...dataCatalogo.map((livro) => ({
+          ...livro,
+          origem: 'Catálogo'
+        })),
+
+        ...livrosUsuarios.map((livro) => ({
+          ...livro,
+          origem: 'Usuário'
+        }))
+      ];
+
+      const resultadosSemDuplicados = todosLivros.filter((livro, index, self) =>
         index === self.findIndex((item) =>
-          item.titulo.toLowerCase() === livro.titulo.toLowerCase() &&
-          item.autor.toLowerCase() === livro.autor.toLowerCase()
+          item.titulo?.toLowerCase() === livro.titulo?.toLowerCase() &&
+          item.autor?.toLowerCase() === livro.autor?.toLowerCase()
         )
       );
 
       setResultados(resultadosSemDuplicados);
+
+      if (resultadosSemDuplicados.length === 0) {
+        setErro('Nenhum livro encontrado. Preencha os dados manualmente.');
+      }
     } catch (err) {
       setErro(err.message);
     }
@@ -92,40 +128,40 @@ function CadastroLivro() {
   };
 
   const cadastrarLivro = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado'));
+  const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado'));
 
-    try {
-      const response = await fetch('http://localhost:5211/api/Livro/Criar', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          titulo,
-          autor,
-          genero,
-          quantPaginas: Number(quantPaginas),
-          dataLeitura,
-          avaliacao: Number(avaliacao),
-          comentario,
-          usuarioID: usuarioLogado.id
-        })
-      });
+  try {
+    const response = await fetch('http://localhost:5211/api/LivroSql/inserir-por-usuario', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        titulo,
+        autor,
+        genero,
+        quantPaginas: Number(quantPaginas),
+        dataLeitura,
+        avaliacao: Number(avaliacao),
+        comentario,
+        usuarioID: usuarioLogado.id,
+        ativo: true
+      })
+    });
 
-      if (!response.ok) {
-        const mensagem = await response.text();
-        throw new Error(mensagem);
-      }
-
-      alert('Livro cadastrado com sucesso!');
-      navigate('/home');
-    } catch (err) {
-      setErro(err.message);
+    if (!response.ok) {
+      const mensagem = await response.text();
+      throw new Error(mensagem);
     }
-  };
 
+    alert('Livro cadastrado com sucesso!');
+    navigate('/home');
+  } catch (err) {
+    setErro(err.message);
+  }
+};
   return (
     <>
       <Header />
@@ -169,7 +205,10 @@ function CadastroLivro() {
               <strong>Livros encontrados:</strong>
 
               {resultados.map((livro) => (
-                <div key={livro.id} className={styles.resultado}>
+                <div
+                  key={`${livro.origem}-${livro.id}`}
+                  className={styles.resultado}
+                >
                   <div>
                     <strong>{livro.titulo}</strong>
                     <br />
@@ -241,7 +280,7 @@ function CadastroLivro() {
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label>Avaliação</Form.Label>
+            <Form.Label>Avaliação (1-5)</Form.Label>
             <Form.Control
               type="number"
               min="1"

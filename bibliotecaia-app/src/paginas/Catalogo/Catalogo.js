@@ -15,18 +15,18 @@ function Catalogo() {
   const [generoFiltro, setGeneroFiltro] = useState('');
 
   useEffect(() => {
-    const buscarCatalogo = async () => {
-      try {
-        const response = await fetch('http://localhost:5211/api/CatalogoLivro/Listar/true');
-        const data = await response.json();
-        setLivros(data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
+  const buscarCatalogo = async () => {
+    try {
+      const response = await fetch('http://localhost:5211/api/LivroSql/listar-view');
+      const data = await response.json();
+      setLivros(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-    buscarCatalogo();
-  }, []);
+  buscarCatalogo();
+}, []);
 
   const livrosFiltrados = livros.filter((livro) => {
     const texto = textoBusca.toLowerCase();
@@ -99,9 +99,7 @@ function Catalogo() {
                   {livro.genero}
                 </span>
 
-                <p className={styles.resumo}>
-                  {livro.resumo}
-                </p>
+                
               </div>
             </Col>
           ))}
