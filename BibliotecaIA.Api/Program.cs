@@ -19,7 +19,6 @@ builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 builder.Services.AddScoped<ILivroAplicacao, LivroAplicacao>();
 builder.Services.AddScoped<ILivroRepositorio, LivroRepositorio>();
 
-builder.Services.AddScoped<IRecomendacaoIAService, RecomendacaoIAService>();
 
 builder.Services.AddHttpClient<IAIService, AIService>();
 
